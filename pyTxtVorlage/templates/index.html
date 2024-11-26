@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textvorlagen</title>
+    <link rel="stylesheet" href="/static/style.css"> <!-- Verlinkung der CSS-Datei -->
+</head>
+<body>
+    <div class="container">
+        <h1>Textvorlagen</h1>
+
+        <!-- Button zum Öffnen des Modals -->
+        <button id="openModalButton" class="open-modal-btn">Textvorlage hinzufügen</button>
+
+        <!-- Suchfeld -->
+        <input type="text" id="searchQuery" placeholder="Live-Suche nach Vorlagen...">
+
+        <!-- Liste der Vorlagen -->
+        <div class="template-list" id="templateList"></div>
+    </div>
+
+    <!-- Modal-Fenster -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Neue Textvorlage hinzufügen</h2>
+            <form id="addTemplateForm">
+                <input type="text" id="title" placeholder="Titel" required>
+                <textarea id="content" placeholder="Vorlagentext" rows="5" required></textarea>
+                <button type="submit">Vorlage speichern</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const openModalButton = document.getElementById('openModalButton');
+        const modal = document.getElementById('modal');
+        const closeModal = document.querySelector('.close-modal');
+        const addTemplateForm = document.getElementById('addTemplateForm');
+        const searchQuery = document.getElementById('searchQuery');
+        const templateList = document.getElementById('templateList');
+
+        // Modal öffnen
+        openModalButton.addEventListener('click', () => {
+            modal.style.display = 'block';
+        });
+
+        // Modal schließen
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Vorlage hinzufügen
+        addTemplateForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+
+            const response = await fetch('/api/templates', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, content })
+            });
+
+            const result = await response.json();
+            showToast(result.message); // Toast für das Hinzufügen anzeigen
+            addTemplateForm.reset();
+            modal.style.display = 'none'; // Modal schließen
+            fetchTemplates(); // Aktualisiere die Liste
+        });
+
+        // Live-Suche
+        searchQuery.addEventListener('input', () => {
+            const query = searchQuery.value.trim();
+            fetchTemplates(query);
+        });
+
+        // Vorlagen abrufen
+        async function fetchTemplates(query = '') {
+            const response = await fetch(`/api/templates?query=${encodeURIComponent(query)}`);
+            const templates = await response.json();
+
+            templateList.innerHTML = templates.map(t => {
+                const truncatedText = truncateText(t.content);
+                return `
+                    <div class="template-item">
+                        <strong>${t.title}</strong>
+                        <pre>${truncatedText}</pre>
+                        <button onclick="toggleExpand(this, \`${t.content.replace(/`/g, '\\`')}\`, \`${truncatedText.replace(/`/g, '\\`')}\`)" data-expanded="false">Expand</button>
+                        <button onclick="copyToClipboard(\`${t.content.replace(/`/g, '\\`')}\`)">Kopieren</button>
+                    </div>
+                `;
+            }).join('');
+
+            if (templates.length === 0) {
+                templateList.innerHTML = `<p>Keine Vorlagen gefunden.</p>`;
+            }
+        }
+
+        // Funktion zum Kürzen langer Texte
+        function truncateText(text, maxLength = 200) {
+            if (text.length > maxLength) {
+                return text.substring(0, maxLength) + '...';
+            }
+            return text;
+        }
+
+        // Funktion zum Umschalten zwischen gekürztem und vollständigem Text
+        function toggleExpand(button, fullText, truncatedText) {
+            const isExpanded = button.getAttribute('data-expanded') === 'true';
+            const textElement = button.previousElementSibling;
+            if (isExpanded) {
+                textElement.textContent = truncatedText;
+                button.textContent = 'Expand';
+                button.setAttribute('data-expanded', 'false');
+            } else {
+                textElement.textContent = fullText;
+                button.textContent = 'Collapse';
+                button.setAttribute('data-expanded', 'true');
+            }
+        }
+
+        // Funktion zum Anzeigen einer Toast-Nachricht
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 2000); // Nach 2 Sekunden verblassen
+
+            setTimeout(() => {
+                toast.remove();
+            }, 2500); // Nach 2.5 Sekunden entfernen
+        }
+
+        // Text in die Zwischenablage kopieren
+        function copyToClipboard(text) {
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = text;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                showToast('Vorlage wurde kopiert!');
+            } catch (err) {
+                console.error('Fehler beim Kopieren der Vorlage:', err);
+                showToast('Fehler beim Kopieren!');
+            }
+            document.body.removeChild(tempTextArea);
+        }
+
+        // Initiale Vorlagen abrufen
+        fetchTemplates();
+
+        // Modal schließen, wenn außerhalb des Modals geklickt wird
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

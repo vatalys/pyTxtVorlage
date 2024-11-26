@@ -1,0 +1,129 @@
+/* Grundlegende Stile für den Körper */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #121212; /* Dunkles Schwarz */
+    color: #f5f5f5; /* Helles Grau */
+    margin: 0;
+    padding: 0;
+}
+
+/* Hauptcontainer */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Überschrift */
+h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #1e90ff; /* Dunkelblau */
+}
+
+/* Button zum Öffnen des Modals */
+.open-modal-btn {
+    background-color: #1e90ff;
+    color: #f5f5f5;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: block;
+    margin: 0 auto 20px;
+}
+
+.open-modal-btn:hover {
+    background-color: #007acc;
+}
+
+/* Suchfeld */
+#searchQuery {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #2a2a2a;
+    color: #f5f5f5;
+    font-size: 1rem;
+}
+
+/* Vorlagenliste */
+.template-list {
+    margin-top: 20px;
+}
+
+.template-item {
+    margin-bottom: 15px;
+    background-color: #1c1c1c;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.template-item strong {
+    font-size: 1.2rem;
+    color: #1e90ff;
+}
+
+.template-item pre {
+    background-color: #2a2a2a;
+    padding: 10px;
+    border-radius: 5px;
+    color: #f5f5f5;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    background-color: #1c1c1c;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    color: #f5f5f5;
+}
+
+.close-modal {
+    color: #f5f5f5;
+    float: right;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-modal:hover {
+    color: #1e90ff;
+}
+/* Toast-Nachricht */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #1e90ff;
+    color: #f5f5f5;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
